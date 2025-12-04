@@ -20,6 +20,203 @@
       </div>
     </div>
 
+        <div class="campo">
+          <label for="reporteCaso">Caso relacionado</label>
+          <select id="reporteCaso">
+            <!-- opciones generadas desde JS -->
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="reporteTipo">Tipo</label>
+          <select id="reporteTipo">
+            <option value="Incidente">Incidente</option>
+            <option value="Alerta">Alerta</option>
+            <option value="Análisis">Análisis</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="reporteSeveridad">Severidad</label>
+          <select id="reporteSeveridad">
+            <option value="Baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+            <option value="Crítica">Crítica</option>
+          </select>
+        </div>
+
+        <div class="campo modal-body-full">
+          <label for="reporteResumen">Resumen</label>
+          <textarea id="reporteResumen" placeholder="Resumen ejecutivo del reporte..."></textarea>
+        </div>
+
+        <div class="campo modal-body-full">
+          <label for="reporteDetalle">Detalle técnico</label>
+          <textarea id="reporteDetalle" placeholder="Describe hallazgos, evidencia, acciones tomadas..."></textarea>
+        </div>
+
+        <div class="campo modal-body-full">
+          <label for="reporteAdjuntos">Adjuntar evidencia</label>
+          <input type="file" id="reporteAdjuntos" multiple />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secundario" type="button" data-modal-close>Cancelar</button>
+        <button class="btn btn-primario" type="button" id="btnCrearReporte">Crear reporte</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ADMIN -->
+  <div class="modal-overlay" id="modalAdmin">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalAdminTitulo">
+      <div class="modal-header">
+        <div class="modal-title" id="modalAdminTitulo">Admin - usuarios e incidentes</div>
+        <button class="modal-close" type="button" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body modal-body-admin">
+        <div class="modal-col">
+          <h3>Usuarios</h3>
+          <ul id="adminUsuariosLista" class="admin-usuarios-lista"></ul>
+        </div>
+        <div class="modal-col">
+          <h3>Incidentes</h3>
+          <div id="adminCasosLista" class="admin-casos-lista"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secundario" type="button" data-modal-close>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL GESTIÓN DE CASOS (TABLA) -->
+  <!-- MODAL ADMIN (GESTIÓN) -->
+  <div class="modal-overlay" id="modalGestionCasos" style="z-index: 1050;">
+    <div class="modal modal-xl" role="dialog" aria-modal="true" aria-labelledby="modalGestionCasosTitulo"
+      style="width: 95%; max-width: 1200px; display: flex; flex-direction: column; max-height: 90vh;">
+      <div class="modal-header">
+        <div class="modal-title" id="modalGestionCasosTitulo">Administración</div>
+        <button class="modal-close" type="button" data-modal-close>&times;</button>
+      </div>
+
+      <!-- Tabs de navegación -->
+      <div class="modal-tabs"
+        style="padding: 0 1.5rem; border-bottom: 1px solid #334155; display: flex; gap: 1rem; flex-shrink: 0;">
+        <button class="tab-btn active" data-tab="casos"
+          style="background: none; border: none; color: white; padding: 1rem; cursor: pointer; border-bottom: 2px solid #3b82f6;">Casos</button>
+        <button class="tab-btn" data-tab="usuarios"
+          style="background: none; border: none; color: #94a3b8; padding: 1rem; cursor: pointer;">Usuarios</button>
+      </div>
+
+      <div class="modal-body"
+        style="padding: 1.5rem; overflow-y: auto; flex: 1; display: flex; flex-direction: column;">
+
+        <!-- VISTA CASOS -->
+        <div id="adminCasosView" style="width: 100%;">
+          <!-- Filtros Responsivos (Flexbox) -->
+          <div class="filtros-container"
+            style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; align-items: center;">
+            <input type="text" id="busquedaCasos" placeholder="Buscar por ID, Título..." class="input-filtro"
+              style="flex: 1 1 200px; background: #1e293b; border: 1px solid #334155; color: white; padding: 0.5rem; border-radius: 0.375rem;">
+
+            <select id="filtroEstado" class="select-filtro"
+              style="flex: 1 1 150px; background: #1e293b; border: 1px solid #334155; color: white; padding: 0.5rem; border-radius: 0.375rem;">
+              <option value="">Todos los estados</option>
+              <option value="activo">Activo</option>
+              <option value="en progreso">En Progreso</option>
+              <option value="pausado">Pausado</option>
+              <option value="cerrado">Cerrado</option>
+            </select>
+
+            <input type="date" id="filtroFecha" class="input-filtro"
+              style="flex: 1 1 150px; background: #1e293b; border: 1px solid #334155; color: white; padding: 0.5rem; border-radius: 0.375rem;">
+          </div>
+
+          <div class="tabla-container"
+            style="overflow-x: auto; border: 1px solid #334155; border-radius: 0.375rem; width: 100%;">
+            <table class="tabla-gestion"
+              style="width: 100%; border-collapse: collapse; color: white; min-width: 800px;">
+              <thead>
+                <tr style="border-bottom: 1px solid #334155; text-align: left; background-color: #0f172a;">
+                  <th style="padding: 1rem; white-space: nowrap;">CASE ID</th>
+                  <th style="padding: 1rem; white-space: nowrap;">STATUS</th>
+                  <th style="padding: 1rem;">TITLE</th>
+                  <th style="padding: 1rem; white-space: nowrap;">DATE</th>
+                  <th style="padding: 1rem; white-space: nowrap;">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="tablaGestionCasosBody">
+                <!-- Rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VISTA USUARIOS -->
+        <div id="adminUsuariosView" style="display: none; width: 100%;">
+          <div class="filtros-container"
+            style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; align-items: center;">
+            <input type="text" id="busquedaUsuarios" placeholder="Buscar por Nombre, Email..." class="input-filtro"
+              style="flex: 1 1 300px; background: #1e293b; border: 1px solid #334155; color: white; padding: 0.5rem; border-radius: 0.375rem;">
+          </div>
+
+          <div class="tabla-container"
+            style="overflow-x: auto; border: 1px solid #334155; border-radius: 0.375rem; width: 100%;">
+            <table class="tabla-gestion"
+              style="width: 100%; border-collapse: collapse; color: white; min-width: 800px;">
+              <thead>
+                <tr style="border-bottom: 1px solid #334155; text-align: left; background-color: #0f172a;">
+                  <th style="padding: 1rem; white-space: nowrap;">ID</th>
+                  <th style="padding: 1rem;">NOMBRE</th>
+                  <th style="padding: 1rem;">EMAIL</th>
+                  <th style="padding: 1rem; white-space: nowrap;">ROL</th>
+                  <th style="padding: 1rem; white-space: nowrap;">ACCIONES</th>
+                </tr>
+              </thead>
+              <tbody id="tablaGestionUsuariosBody">
+                <!-- Rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer" style="flex-shrink: 0;">
+        <button class="btn btn-secundario" type="button" data-modal-close>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR USUARIO -->
+  <div class="modal-overlay" id="modalEditarUsuario" style="z-index: 1100;">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalEditarUsuarioTitulo">
+      <div class="modal-header">
+        <div class="modal-title" id="modalEditarUsuarioTitulo">Editar usuario</div>
+        <button class="modal-close" type="button" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editUserId">
+
+        <div class="campo modal-body-full">
+          <label for="editNombreUsuario">Nombre completo</label>
+          <input type="text" id="editNombreUsuario" placeholder="Ej: Juan Pérez" />
+        </div>
+
+        <div class="campo modal-body-full">
+          <label for="editEmailUsuario">Correo electrónico</label>
+          <input type="email" id="editEmailUsuario" placeholder="usuario@osint.com" />
+        </div>
+
+        <div class="campo">
+          <label for="editRolUsuario">Rol</label>
+          <select id="editRolUsuario">
+            <option value="admin">Admin</option>
+            <option value="consultor">Consultor</option>
+            <option value="capturista">Capturista</option>
+          </select>
     <div class="casos-slider" id="casosSlider">
       <div class="casos-track">
         @foreach($casos as $caso)
