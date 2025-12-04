@@ -84,17 +84,23 @@ class CapturistaWebController extends Controller
     {
         $user = Auth::user();
         
-        // Verificar que el caso esté asignado al usuario
+        // Verificar asignación
         $asignacion = AsignacionCaso::where('id_caso', $idCaso)
             ->where('id_usuario', $user->id_usuario)
             ->first();
-        
+            
         if (!$asignacion) {
-            abort(403, 'No tiene permiso para ver este caso');
+            abort(403, 'No tiene permiso para acceder a este caso');
         }
         
-        $caso = Caso::findOrFail($idCaso);
+        $caso = Caso::find($idCaso);
         
-        return view('capturista.reportes', compact('caso', 'user'));
+        return view('capturista.reportes', compact('caso'));
+    }
+
+    public function todasEvidencias()
+    {
+        $herramientas = \App\Herramienta::all();
+        return view('capturista.evidencias-global', compact('herramientas'));
     }
 }

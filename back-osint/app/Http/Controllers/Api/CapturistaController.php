@@ -495,6 +495,60 @@ class CapturistaController extends Controller
     }
 
     /**
+     * Obtener todas las evidencias de los casos asignados al usuario
+     */
+    public function getAllEvidencias(Request $request)
+    {
+        try {
+            $usuario = Auth::user();
+            
+            if (!$usuario) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Usuario no autenticado'
+                ], 401);
+            }
+
+            // Obtener IDs de casos asignados
+            $casosIds = AsignacionCaso::where('id_usuario', $usuario->id_usuario)
+                ->pluck('id_caso');
+
+            // Obtener evidencias de esos casos con información del caso
+            $evidencias = Evidencia::whereIn('id_caso', $casosIds)
+                ->with('caso:id_caso,nombre')
+                ->orderBy('fecha_creacion', 'desc')
+                ->get();
+
+            $evidenciasData = $evidencias->map(function ($evidencia) {
+                return [
+                    'id_evidencia' => $evidencia->id_evidencia,
+                    'tipo' => $evidencia->tipo,
+                    'descripcion' => $evidencia->descripcion,
+                    'fecha_creacion' => $evidencia->fecha_creacion,
+                    'caso' => [
+                        'id_caso' => $evidencia->caso->id_caso,
+                        'nombre' => $evidencia->caso->nombre,
+                        'codigo' => $evidencia->caso->codigo_caso ?? 'N/A'
+                    ]
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Todas las evidencias obtenidas exitosamente',
+                'data' => $evidenciasData
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener todas las evidencias',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Generar reporte completo del caso
      */
     public function generarReporteCompleto(Request $request, $idCaso)
@@ -824,9 +878,9 @@ class CapturistaController extends Controller
                     preg_match("/_(persona|dominio|email|telefono)_{$idCaso}_/", $nombreArchivo)) {
                     
                     $reportesCaso[] = [
-                        'nombre_archivo' => $nombreArchivo,
-                        'tamano' => Storage::disk('local')->size($archivo),
-                        'fecha_creacion' => Storage::disk('local')->lastModified($archivo)
+                        'nombre' => $nombreArchivo,
+                        'tamano' => $this->formatBytes(Storage::disk('local')->size($archivo)),
+                        'fecha' => date('d/m/Y H:i', Storage::disk('local')->lastModified($archivo))
                     ];
                 }
             }
@@ -834,7 +888,9 @@ class CapturistaController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Reportes obtenidos exitosamente',
-                'data' => $reportesCaso
+                'data' => [
+                    'reportes' => $reportesCaso
+                ]
             ], 200);
 
         } catch (\Exception $e) {
@@ -844,6 +900,18 @@ class CapturistaController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    private function formatBytes($bytes, $precision = 2) { 
+        $units = array('B', 'KB', 'MB', 'GB', 'TB'); 
+    
+        $bytes = max($bytes, 0); 
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
+        $pow = min($pow, count($units) - 1); 
+    
+        $bytes /= pow(1024, $pow); 
+    
+        return round($bytes, $precision) . ' ' . $units[$pow]; 
     }
 }
 

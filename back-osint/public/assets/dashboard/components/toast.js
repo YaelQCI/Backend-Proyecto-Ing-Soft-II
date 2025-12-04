@@ -122,3 +122,4 @@ class Toast {
 
 // Exportar instancia única
 const toast = new Toast();
+window.toast = toast;

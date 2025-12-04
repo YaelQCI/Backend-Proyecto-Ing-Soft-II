@@ -34,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/casos/{id}', [App\Http\Controllers\CapturistaWebController::class, 'casoDetalle'])->name('capturista.caso-detalle');
         Route::get('/casos/{idCaso}/evidencias', [App\Http\Controllers\CapturistaWebController::class, 'evidencias'])->name('capturista.evidencias');
         Route::get('/casos/{idCaso}/reportes', [App\Http\Controllers\CapturistaWebController::class, 'reportes'])->name('capturista.reportes');
+        Route::get('/evidencias', [App\Http\Controllers\CapturistaWebController::class, 'todasEvidencias'])->name('capturista.todas-evidencias');
 
         // Rutas de API (Internas, usan sesión web)
         Route::prefix('api')->group(function () {
@@ -42,6 +43,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/casos/{id}', [App\Http\Controllers\Api\CapturistaController::class, 'verCaso']);
             
             // Gestión de evidencias
+            Route::get('/evidencias', [App\Http\Controllers\Api\CapturistaController::class, 'getAllEvidencias']);
             Route::get('/casos/{idCaso}/evidencias', [App\Http\Controllers\Api\CapturistaController::class, 'getEvidencias']);
             Route::post('/evidencias', [App\Http\Controllers\Api\CapturistaController::class, 'agregarEvidencia']);
             Route::put('/evidencias/{id}', [App\Http\Controllers\Api\CapturistaController::class, 'actualizarEvidencia']);

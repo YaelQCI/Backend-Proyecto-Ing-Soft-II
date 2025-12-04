@@ -174,3 +174,4 @@ class Loading {
 
 // Exportar instancia única
 const loading = new Loading();
+window.loading = loading;

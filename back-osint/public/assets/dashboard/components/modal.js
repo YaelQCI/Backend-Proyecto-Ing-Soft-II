@@ -17,6 +17,7 @@ class Modal {
      * @param {boolean} options.closeOnBackdrop - Cerrar al hacer clic fuera
      */
     show(options = {}) {
+        console.log('Modal.show iniciado', options);
         const {
             title = '',
             content = '',
@@ -25,28 +26,29 @@ class Modal {
             closeOnBackdrop = true
         } = options;
 
-        // Cerrar modal existente si hay uno
-        this.close();
+        // Cerrar modal existente inmediatamente si hay uno
+        console.log('Intentando cerrar modal previo...');
+        this.close(true);
 
         // Crear estructura del modal
         const modalHTML = `
-      <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-container modal-${size}">
-          <div class="modal-header">
-            <h3 class="modal-title">${title}</h3>
-            <button class="modal-close" id="modalClose" aria-label="Cerrar">
+      <div class="app-modal-overlay" id="modalOverlay">
+        <div class="app-modal-container app-modal-${size}">
+          <div class="app-modal-header">
+            <h3 class="app-modal-title">${title}</h3>
+            <button class="app-modal-close" id="modalClose" aria-label="Cerrar">
               <svg viewBox="0 0 24 24" width="20" height="20">
                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
               </svg>
             </button>
           </div>
-          <div class="modal-body">
+          <div class="app-modal-body">
             ${content}
           </div>
           ${buttons.length > 0 ? `
-            <div class="modal-footer">
+            <div class="app-modal-footer">
               ${buttons.map((btn, index) => `
-                <button class="modal-btn ${btn.class || 'modal-btn-secondary'}" data-btn-index="${index}">
+                <button class="app-modal-btn ${btn.class ? 'app-' + btn.class : 'app-modal-btn-secondary'}" data-btn-index="${index}">
                   ${btn.text}
                 </button>
               `).join('')}
@@ -59,6 +61,18 @@ class Modal {
         // Insertar en el DOM
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         this.activeModal = document.getElementById('modalOverlay');
+
+        // Debug styles
+        const styles = window.getComputedStyle(this.activeModal);
+        console.log('Modal Styles Debug:', {
+            zIndex: styles.zIndex,
+            opacity: styles.opacity,
+            display: styles.display,
+            visibility: styles.visibility,
+            position: styles.position
+        });
+
+        console.log('Modal insertado en DOM:', this.activeModal);
 
         // Event listeners
         const closeBtn = document.getElementById('modalClose');
@@ -87,7 +101,9 @@ class Modal {
 
         // Animación de entrada
         requestAnimationFrame(() => {
-            this.activeModal.classList.add('modal-active');
+            if (this.activeModal) {
+                this.activeModal.classList.add('app-modal-active');
+            }
         });
 
         // Prevenir scroll del body
@@ -98,18 +114,25 @@ class Modal {
 
     /**
      * Cerrar modal activo
+     * @param {boolean} immediate - Cerrar sin animación
      */
-    close() {
+    close(immediate = false) {
         if (this.activeModal) {
-            this.activeModal.classList.remove('modal-active');
+            this.activeModal.classList.remove('app-modal-active');
 
-            setTimeout(() => {
+            const remove = () => {
                 if (this.activeModal && this.activeModal.parentNode) {
                     this.activeModal.parentNode.removeChild(this.activeModal);
                 }
                 this.activeModal = null;
                 document.body.style.overflow = '';
-            }, 300);
+            };
+
+            if (immediate) {
+                remove();
+            } else {
+                setTimeout(remove, 300);
+            }
         }
     }
 
@@ -122,7 +145,7 @@ class Modal {
     confirm(message, onConfirm, onCancel) {
         this.show({
             title: 'Confirmación',
-            content: `<p class="modal-confirm-message">${message}</p>`,
+            content: `<p class="app-modal-confirm-message">${message}</p>`,
             size: 'small',
             buttons: [
                 {
@@ -159,9 +182,9 @@ class Modal {
         this.show({
             title: type.charAt(0).toUpperCase() + type.slice(1),
             content: `
-        <div class="modal-alert modal-alert-${type}">
-          <div class="modal-alert-icon">${icons[type]}</div>
-          <p class="modal-alert-message">${message}</p>
+        <div class="app-modal-alert app-modal-alert-${type}">
+          <div class="app-modal-alert-icon">${icons[type]}</div>
+          <p class="app-modal-alert-message">${message}</p>
         </div>
       `,
             size: 'small',
@@ -178,3 +201,4 @@ class Modal {
 
 // Exportar instancia única
 const modal = new Modal();
+window.modal = modal;

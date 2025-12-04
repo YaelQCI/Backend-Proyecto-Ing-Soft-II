@@ -115,6 +115,20 @@ class CapturistaAPI {
     }
 
     /**
+     * Obtener todas las evidencias de los casos asignados
+     */
+    async getAllEvidencias() {
+        try {
+            return await this.request('/evidencias', {
+                method: 'GET'
+            });
+        } catch (error) {
+            console.error('Error al obtener todas las evidencias:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Obtener evidencias de un caso
      * @param {number} idCaso - ID del caso
      */
