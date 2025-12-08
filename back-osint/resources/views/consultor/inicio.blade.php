@@ -77,7 +77,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: 1fr 1fr; /* mitad izquierda / mitad derecha */
             gap: 20px;
             margin-top: 20px;
         }
@@ -98,25 +98,45 @@
         .stat-card h3 {
             color: #667eea;
             font-size: 22px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             text-align: center;
+        }
+
+         /* Texto descriptivo agregado */
+        .stat-description {
+            text-align: center;
+            color: #444;
+            font-size: 14px;
+            margin-bottom: 15px;
         }
 
         .stat-options {
             list-style: none;
-            padding-left: 10px;
+            padding: 0;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;    /* Centra horizontalmente */
+            align-items: center;
         }
 
         .stat-options li {
-            margin: 8px 0;
-            cursor: pointer;
+            background: #eef0ff;        /* Fondo suave acorde al estilo */
             color: #444;
+            padding: 12px 20px;
+            border-radius: 8px;
             font-size: 15px;
-            transition: color 0.2s;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-align: center;
+            min-width: 220px;           /* Asegura tamaño uniforme */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .stat-options li:hover {
-            color: #667eea;
+            background: #667eea;        /* Azul principal del sistema */
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             font-weight: bold;
         }
     </style>
@@ -143,56 +163,33 @@
             <!-- USUARIOS -->
             <div class="stat-card">
                 <h3>Usuarios</h3>
+
+                <p class="stat-description">
+                    Acceda a una lista de usuarios para consultar información
+                </p>
+
                 <ul class="stat-options">
-                    <li onclick="goTo('consultor/usuarios/lista-usuarios')">Lista de usuarios activos</li>
-                    <!-- <li onclick="goTo('consultor/usuarios/detalle-usuario')">Detalle de usuario</li> -->
+                    <li onclick="goTo('consultor/usuarios/lista-usuarios')">
+                        Lista de usuarios activos
+                    </li>
                 </ul>
             </div>
 
             <!-- CASOS -->
             <div class="stat-card">
                 <h3>Casos</h3>
+
+                <p class="stat-description">
+                    Acceda a una lista de casos para consultar su información individualmente
+                </p>
+
                 <ul class="stat-options">
-                    <li onclick="goTo('consultor/casos/lista-casos')">Lista de casos</li>
+                    <li onclick="goTo('consultor/casos/lista-casos')">
+                        Lista de casos
+                    </li>
                     <!-- <li onclick="goTo('consultor/casos/detalle-caso.html')">Detalle de caso con creador</li>
                     <li onclick="goTo('consultor/casos/usuarios-asignados.html')">Usuarios asignados a un caso</li> -->
                 </ul>
-            </div>
-
-            <!-- EVIDENCIAS -->
-            <div class="stat-card">
-                <h3>Evidencias</h3>
-                <!-- <ul class="stat-options">
-                    <li onclick="goTo('consultor/evidencias/evidencias-caso.html')">Evidencias de un caso</li>
-                </ul> -->
-            </div>
-
-            <!-- HERRAMIENTAS -->
-            <div class="stat-card">
-                <h3>Herramientas</h3>
-                <!-- <ul class="stat-options">
-                    <li onclick="goTo('consultor/herramientas/lista-herramientas.html')">Lista de herramientas</li>
-                    <li onclick="goTo('consultor/herramientas/herramientas-categoria.html')">Herramientas de una
-                        categoría</li>
-                </ul> -->
-            </div>
-
-            <!-- ACCIONES E HISTORIAL -->
-            <div class="stat-card">
-                <h3>Acciones e historial</h3>
-                <!-- <ul class="stat-options">
-                    <li onclick="goTo('consultor/acciones/acciones-usuario.html')">Acciones de un usuario</li>
-                    <li onclick="goTo('consultor/acciones/historial-caso.html')">Historial de un caso</li>
-                </ul> -->
-            </div>
-
-            <!-- PLATAFORMAS -->
-            <div class="stat-card">
-                <h3>Plataformas</h3>
-                <!-- <ul class="stat-options">
-                    <li onclick="goTo('consultor/plataformas/plataformas-vinculadas.html')">Plataformas vinculadas</li>
-                </ul> -->
-
             </div>
 
         </div>

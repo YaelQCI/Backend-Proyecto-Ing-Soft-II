@@ -110,6 +110,7 @@
                     <th>Email</th>
                     <th>Rol</th>
                     <th>Detalle</th>
+                    <th>Casos</th>
                 </tr>
             </thead>
             <tbody id="tablaUsuarios">
@@ -123,6 +124,12 @@
                             <a href="{{ route('consultor.usuarios.show', $usuario->id_usuario) }}" class="btn-ver"
                                 style="text-decoration: none;">
                                 Ver
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ route('consultor.usuarios.casos-relacionados', $usuario->id_usuario) }}" class="btn-ver"
+                                style="text-decoration: none;">
+                                Ver Casos
                             </a>
                         </td>
                     </tr>
