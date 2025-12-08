@@ -864,7 +864,6 @@ document.addEventListener('DOMContentLoaded', () => {
       herramientas = await res.json();
 
       refrescarSidebarDerecha();
-      refrescarSidebarIzquierda();
 
     } catch (error) {
       console.error("Error cargando sidebars:", error);
@@ -875,69 +874,67 @@ document.addEventListener('DOMContentLoaded', () => {
     const cont = document.querySelector("#sidebarDerecha .sidebar-menu");
     if (!cont) return;
 
-    let html = `
-      <button class="sidebar-item" type="button"
-          onclick="window.open('https://chatgpt.com/g/g-692e71b1700c81919853137b08b627fe-agente-udint-v1-0', '_blank')">
-          Agente de IA
-      </button>
-    `;
-
-    const sinCategoria = herramientas.filter(h => !h.id_categoria);
-
-    sinCategoria.forEach(h => {
-      html += `
-        <button class="sidebar-item" onclick="window.open('${h.link}', '_blank')">
-          ${h.nombre}
-        </button>
-      `;
-    });
-
-    cont.innerHTML = html;
-  }
-
-  function refrescarSidebarIzquierda() {
-    const cont = document.querySelector("#sidebarIzquierda .sidebar-menu");
-    if (!cont) return;
-
     cont.innerHTML = "";
 
     const porCategoria = {};
 
+    // Agrupar herramientas por categoría
     herramientas.forEach(h => {
-      if (!h.categoria) return;
+        if (!h.categoria || !h.categoria.nombre) return;
 
-      const cat = h.categoria.nombre;
+        const cat = h.categoria.nombre;
 
-      if (!porCategoria[cat]) porCategoria[cat] = [];
-      porCategoria[cat].push(h);
+        if (!porCategoria[cat]) porCategoria[cat] = [];
+        porCategoria[cat].push(h);
     });
 
     Object.keys(porCategoria).forEach(cat => {
+        cont.innerHTML += `
+            <div class="sidebar-category-header" style="color: white; padding: 10px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                ${cat}
+            </div>
+        `;
 
-      const catId = cat.replace(/\s+/g, "_");
+        porCategoria[cat].forEach(h => {
+            cont.innerHTML += `
+                <button class="sidebar-item" type="button"
+                    onclick="window.open('${h.link}', '_blank')">
+                    ${h.nombre}
+                </button>
+            `;
+        });
+    });
 
-      cont.innerHTML += `
-        <button class="sidebar-item categoria-btn" data-target="${catId}">
-          ${cat}
-        </button>
+    // Herramientas sin categoría "Otros"
+    const sinCategoria = herramientas.filter(h => !h.categoria || !h.categoria.nombre);
+    if (sinCategoria.length > 0) {
+        cont.innerHTML += `
+            <div class="sidebar-category-header" style="color: white; padding: 10px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                Otros
+            </div>
+        `;
 
-        <div class="categoria-contenido hidden" id="${catId}">
-          ${porCategoria[cat].map(h => `
-            <button class="sidebar-subitem" onclick="window.open('${h.link}', '_blank')">
-              ${h.nombre}
-            </button>
-          `).join("")}
+        sinCategoria.forEach(h => {
+            cont.innerHTML += `
+                <button class="sidebar-item" type="button"
+                    onclick="window.open('${h.link}', '_blank')">
+                    ${h.nombre}
+                </button>
+            `;
+        });
+    }
+    cont.innerHTML += `
+        <div class="sidebar-category-header" style="color: white; padding: 10px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            IA Tools
         </div>
-      `;
-    });
 
-    document.querySelectorAll(".categoria-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const target = document.getElementById(btn.dataset.target);
-        target.classList.toggle("hidden");
-      });
-    });
-  }
+        <button class="sidebar-item" type="button"
+            onclick="window.open('https://chatgpt.com/g/g-692e71b1700c81919853137b08b627fe-agente-udint-v1-0', '_blank')">
+            Agente de IA
+        </button>
+    `;
+}
+
   formAgregarTool.addEventListener('submit', async (e) => {
     e.preventDefault();
 
