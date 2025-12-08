@@ -807,7 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <option value="">Seleccione una opción</option>
         <option value="none">Sin categoría</option>
         ${categoriasDB.map(cat => `
-          <option value="${cat.id}">${cat.nombre}</option>
+          <option value="${cat.id_categoria}">${cat.nombre}</option>
         `).join('')}
         <option value="other">Otra categoría...</option>
       `;
@@ -880,48 +880,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Agrupar herramientas por categoría
     herramientas.forEach(h => {
-        if (!h.categoria || !h.categoria.nombre) return;
+      if (!h.categoria || !h.categoria.nombre) return;
 
-        const cat = h.categoria.nombre;
+      const cat = h.categoria.nombre;
 
-        if (!porCategoria[cat]) porCategoria[cat] = [];
-        porCategoria[cat].push(h);
+      if (!porCategoria[cat]) porCategoria[cat] = [];
+      porCategoria[cat].push(h);
     });
 
-    Object.keys(porCategoria).forEach(cat => {
-        cont.innerHTML += `
+    Object.keys(porCategoria).sort().forEach(cat => {
+      cont.innerHTML += `
             <div class="sidebar-category-header" style="color: white; padding: 10px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                 ${cat}
             </div>
         `;
 
-        porCategoria[cat].forEach(h => {
-            cont.innerHTML += `
+      porCategoria[cat].forEach(h => {
+        cont.innerHTML += `
                 <button class="sidebar-item" type="button"
                     onclick="window.open('${h.link}', '_blank')">
                     ${h.nombre}
                 </button>
             `;
-        });
+      });
     });
 
     // Herramientas sin categoría "Otros"
     const sinCategoria = herramientas.filter(h => !h.categoria || !h.categoria.nombre);
     if (sinCategoria.length > 0) {
-        cont.innerHTML += `
+      cont.innerHTML += `
             <div class="sidebar-category-header" style="color: white; padding: 10px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                 Otros
             </div>
         `;
 
-        sinCategoria.forEach(h => {
-            cont.innerHTML += `
+      sinCategoria.forEach(h => {
+        cont.innerHTML += `
                 <button class="sidebar-item" type="button"
                     onclick="window.open('${h.link}', '_blank')">
                     ${h.nombre}
                 </button>
             `;
-        });
+      });
     }
     cont.innerHTML += `
         <div class="sidebar-category-header" style="color: white; padding: 10px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
@@ -933,7 +933,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Agente de IA
         </button>
     `;
-}
+  }
 
   formAgregarTool.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -964,6 +964,17 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify(data)
       });
 
+      if (!res.ok) {
+        let errorMsg = 'Error en el servidor';
+        try {
+          const errData = await res.json();
+          errorMsg = errData.message || JSON.stringify(errData);
+        } catch (e) {
+          errorMsg = res.statusText || 'Error desconocido';
+        }
+        throw new Error(errorMsg);
+      }
+
       const nueva = await res.json();
       herramientas.unshift(nueva);
 
@@ -974,7 +985,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (err) {
       console.error('Error guardando herramienta:', err);
-      alert('Error guardando herramienta.');
+      alert('Error guardando herramienta: ' + err.message);
     }
   });
 

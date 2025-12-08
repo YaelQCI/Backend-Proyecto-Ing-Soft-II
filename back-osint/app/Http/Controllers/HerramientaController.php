@@ -27,35 +27,55 @@ class HerramientaController extends Controller
             'categoria_nueva' => 'nullable|string'
         ]);
 
-        if ($request->categoria === 'none') {
-            $categoria_id = null;
-        }
+        \DB::beginTransaction();
 
-        else if ($request->categoria === 'other') {
-            $categoria = CategoriaHerramienta::firstOrCreate([
-                'nombre' => $request->categoria_nueva
+        try {
+            if ($request->categoria === 'none') {
+                $categoria_id = null;
+            }
+            else if ($request->categoria === 'other') {
+                // Verificar si ya existe para evitar duplicados por concurrencia o lógica
+                $categoria = CategoriaHerramienta::firstOrCreate([
+                    'nombre' => $request->categoria_nueva
+                ]);
+                $categoria_id = $categoria->id_categoria;
+            }
+            else {
+                $categoria_id = $request->categoria;
+            }
+
+            $herramienta = Herramienta::create([
+                'nombre' => $request->nombre,
+                'link' => $request->link ?? '',
+                'id_categoria' => $categoria_id
             ]);
-            $categoria_id = $categoria->id_categoria;
+
+            $this->registrarLog('agregar_herramienta', "Nueva herramienta '{$herramienta->nombre}' agregada");
+
+            \DB::commit();
+
+            // Recargar la relación para devolver el objeto completo
+            $herramienta->load('categoria');
+
+            return response()->json($herramienta, 201);
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error("Error agregando herramienta: " . $e->getMessage());
+            return response()->json(['message' => 'Error al guardar la herramienta: ' . $e->getMessage()], 500);
         }
-
-        else {
-            $categoria_id = $request->categoria;
-        }
-
-        $herramientas = Herramienta::create([
-            'nombre' => $request->nombre,
-            'link' => $request->link,
-            'id_categoria' => $categoria_id
-        ]);
-
-        $this->registrarLog('agregar_herramienta', "Nueva herramienta '{$herramientas->nombre}' agregada");
-
-        return response()->json($herramientas, 201);
     }
 
     public function destroy($id)
     {
-        Herramienta::where('id_herramienta', $id)->delete();
+        $herramienta = Herramienta::find($id);
+
+        if ($herramienta) {
+            $nombre = $herramienta->nombre;
+            $herramienta->delete();
+            $this->registrarLog('eliminar_herramienta', "Herramienta '{$nombre}' eliminada");
+        }
+        
         return response()->json(['ok' => true]);
     }
 
