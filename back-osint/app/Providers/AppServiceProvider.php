@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         if ($this->app->environment('production')) {
-            URL::forceScheme('http');
+            URL::forceScheme('https');
         }
 
         // Compartir categorías y herramientas con el layout dashboard
