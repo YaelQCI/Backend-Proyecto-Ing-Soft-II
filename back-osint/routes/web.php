@@ -118,7 +118,6 @@ Route::middleware(['auth'])->group(function () {
 
     });
 
-});
     // Logging for Dashboard
     Route::post('/dashboard/log-activity', [App\Http\Controllers\AdminDashboardController::class, 'logFromFrontend']);
 
